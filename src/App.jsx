@@ -1,141 +1,105 @@
-import React from 'react';
-// Importación de todos nuestros átomos
-import Title from './components/atoms/Title';
-import Label from './components/atoms/Label';
-import Input from './components/atoms/Input';
-import Button from './components/atoms/Button';
-import Badge from './components/atoms/Badge';
+import React, { useState } from 'react';
+// Importamos las moléculas
+import FormField from './components/molecules/FormField';
+import RoomCodeDisplay from './components/molecules/RoomCodeDisplay';
+import StudentRow from './components/molecules/StudentRow';
+import EmptyState from './components/molecules/EmptyState';
 
-// Importación de los iconos de lucide-react para las pruebas
-import {
-  User,
-  Key,
-  Plus,
-  LogOut,
-  Users,
-  CheckCircle,
-  Info
-} from 'lucide-react';
+// Importamos un par de átomos e iconos para complementar la vista de pruebas
+import Title from './components/atoms/Title';
+import Button from './components/atoms/Button';
+import { User, Key, Users, Play } from 'lucide-react';
 
 export default function App() {
-  return (
-    <div className="min-h-screen bg-Neutral-50 p-6 md:p-12 space-y-12">
+  // Estados temporales solo para hacer interactivos los inputs en esta prueba
+  const [roomName, setRoomName] = useState('');
+  const [studentName, setStudentName] = useState('');
 
-      {/* Encabezado del catálogo */}
-      <header className="border-b border-GrayBlue-200 pb-6">
-        <Title level={1}>Catálogo de Átomos (UI Kit)</Title>
-        <p className="text-GrayBlue-500 text-sm md:text-base mt-2">
-          Guía visual de los componentes base del proyecto utilizando la paleta de colores oficial.
+  return (
+    <div className="min-h-screen bg-Neutral-50 p-6 md:p-12 space-y-10">
+
+      {/* Encabezado */}
+      <header className="border-b border-GrayBlue-200 pb-4">
+        <Title level={1}>Laboratorio de Moléculas</Title>
+        <p className="text-GrayBlue-500 text-sm">
+          Visualización de componentes de segundo nivel (combinaciones de átomos).
         </p>
       </header>
 
-      {/* Sección 1: Títulos (Title) */}
-      <section className="space-y-4">
-        <Title level={3} className="text-BlueDark-600 uppercase tracking-wider text-xs font-bold">
-          1. Componente: Title
-        </Title>
-        <div className="bg-white p-6 rounded-xl border border-GrayBlue-200 space-y-3">
-          <Title level={1}>Título Nivel 1 (H1)</Title>
-          <Title level={2}>Título Nivel 2 (H2)</Title>
-          <Title level={3}>Título Nivel 3 (H3)</Title>
-          <Title level={4}>Título Nivel 4 (H4)</Title>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        {/* COLUMNA IZQUIERDA: FORMULARIOS Y ACCESOS */}
+        <div className="space-y-6">
+
+          {/* Caso de Uso 1: FormField (Inputs con etiquetas y errores integrados) */}
+          <section className="bg-white p-6 rounded-xl border border-GrayBlue-200 space-y-4 shadow-sm">
+            <Title level={3} className="text-BlueDark-600 text-xs uppercase tracking-wider font-bold">
+              1. Molécula: FormField
+            </Title>
+
+            <FormField
+              label="Nombre de la Clase / Actividad"
+              id="room-name"
+              placeholder="Ej. Taller de Redes - Equipo A"
+              icon={Users}
+              value={roomName}
+              onChange={(e) => setRoomName(e.target.value)}
+              required
+            />
+
+            <FormField
+              label="Código de Acceso (Simulación de Error)"
+              id="room-code-error"
+              placeholder="Introduce las 4 letras"
+              icon={Key}
+              value="AB12"
+              onChange={() => { }}
+              error="El código de la sala ya no es válido o expiró."
+            />
+          </section>
+
+          {/* Caso de Uso 2: RoomCodeDisplay (Visualizador con botón de copiado) */}
+          <section className="bg-white p-6 rounded-xl border border-GrayBlue-200 space-y-4 shadow-sm">
+            <Title level={3} className="text-BlueDark-600 text-xs uppercase tracking-wider font-bold">
+              2. Molécula: RoomCodeDisplay
+            </Title>
+            <p className="text-sm text-GrayBlue-500">Así lo verá el docente al iniciar una sesión:</p>
+
+            <RoomCodeDisplay code="FIFO-953" />
+          </section>
         </div>
-      </section>
 
-      {/* Sección 2: Etiquetas (Label) */}
-      <section className="space-y-4">
-        <Title level={3} className="text-BlueDark-600 uppercase tracking-wider text-xs font-bold">
-          2. Componente: Label
-        </Title>
-        <div className="bg-white p-6 rounded-xl border border-GrayBlue-200 flex flex-col md:flex-row gap-6">
-          <div>
-            <span className="text-xs text-GrayBlue-400 block mb-1">Campo normal:</span>
-            <Label htmlFor="input-ejemplo">Nombre del Alumno</Label>
-          </div>
-          <div>
-            <span className="text-xs text-GrayBlue-400 block mb-1">Campo obligatorio (`required`):</span>
-            <Label htmlFor="input-ejemplo-2" required>Código de la Sala</Label>
-          </div>
+        {/* COLUMNA DERECHA: LISTAS Y ESTADOS DE ESPERA */}
+        <div className="space-y-6">
+
+          {/* Caso de Uso 3: StudentRow (Fila individual en orden de llegada) */}
+          <section className="bg-white p-6 rounded-xl border border-GrayBlue-200 space-y-4 shadow-sm">
+            <Title level={3} className="text-BlueDark-600 text-xs uppercase tracking-wider font-bold">
+              3. Molécula: StudentRow
+            </Title>
+            <p className="text-sm text-GrayBlue-500">Lista simulada por orden de llegada (Estructura FIFO):</p>
+
+            <div className="space-y-2 max-h-60 overflow-y-auto">
+              <StudentRow name="Jose Alfonso" index={0} status="assigned" />
+              <StudentRow name="María Fernanda" index={1} status="waiting" />
+              <StudentRow name="Carlos Eduardo" index={2} status="waiting" />
+            </div>
+          </section>
+
+          {/* Caso de Uso 4: EmptyState (Pantalla de espera inicial) */}
+          <section className="bg-white p-6 rounded-xl border border-GrayBlue-200 space-y-4 shadow-sm">
+            <Title level={3} className="text-BlueDark-600 text-xs uppercase tracking-wider font-bold">
+              4. Molécula: EmptyState
+            </Title>
+
+            <EmptyState
+              title="Sala de espera vacía"
+              description="Los alumnos que ingresen el código aparecerán aquí en tiempo real bajo la fila FIFO."
+            />
+          </section>
+
         </div>
-      </section>
-
-      {/* Sección 3: Campos de Entrada (Input) */}
-      <section className="space-y-4">
-        <Title level={3} className="text-BlueDark-600 uppercase tracking-wider text-xs font-bold">
-          3. Componente: Input
-        </Title>
-        <div className="bg-white p-6 rounded-xl border border-GrayBlue-200 space-y-4 max-w-md">
-          <div>
-            <Label>Input simple:</Label>
-            <Input placeholder="Escribe algo aquí..." />
-          </div>
-          <div>
-            <Label>Input con icono a la izquierda (`icon`):</Label>
-            <Input placeholder="Nombre de usuario" icon={User} />
-          </div>
-          <div>
-            <Label>Input con estado de error (`error`):</Label>
-            <Input placeholder="Código incorrecto" icon={Key} error />
-          </div>
-        </div>
-      </section>
-
-      {/* Sección 4: Botones (Button) */}
-      <section className="space-y-4">
-        <Title level={3} className="text-BlueDark-600 uppercase tracking-wider text-xs font-bold">
-          4. Componente: Button
-        </Title>
-        <div className="bg-white p-6 rounded-xl border border-GrayBlue-200 space-y-6">
-          {/* Variantes por defecto */}
-          <div className="flex flex-wrap gap-4">
-            <Button variant="primary">Botón Primario</Button>
-            <Button variant="secondary">Botón Secundario</Button>
-            <Button variant="danger">Botón Peligro</Button>
-          </div>
-
-          {/* Con iconos */}
-          <div className="flex flex-wrap gap-4">
-            <Button variant="primary" icon={Plus}>
-              Crear Nueva Sala
-            </Button>
-            <Button variant="secondary" iconRight={Users}>
-              Ver Integrantes
-            </Button>
-            <Button variant="danger" icon={LogOut}>
-              Salir de la fila
-            </Button>
-          </div>
-
-          {/* Estados especiales */}
-          <div className="flex flex-wrap gap-4">
-            <Button variant="primary" loading>
-              Procesando fila...
-            </Button>
-            <Button variant="primary" disabled>
-              Acción Deshabilitada
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Sección 5: Etiquetas de Estado (Badge) */}
-      <section className="space-y-4">
-        <Title level={3} className="text-BlueDark-600 uppercase tracking-wider text-xs font-bold">
-          5. Componente: Badge
-        </Title>
-        <div className="bg-white p-6 rounded-xl border border-GrayBlue-200 flex flex-wrap gap-4">
-          <Badge variant="default" icon={Users}>
-            45 Alumnos en espera
-          </Badge>
-          <Badge variant="success" icon={CheckCircle}>
-            Fila FIFO Activa
-          </Badge>
-          <Badge variant="info" icon={Info}>
-            Rol: Docente
-          </Badge>
-        </div>
-      </section>
-
+      </div>
     </div>
   );
 }
