@@ -3,26 +3,33 @@ import { RoomProvider } from './context/RoomContext';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import RoleSelection from './pages/RoleSelection';
-import GeneradorEquipos from './pages/GeneradorEquipos'; // <-- Importamos la nueva pantalla
+import LoginDocente from './pages/LoginDocente';       // <-- 1. Importamos el login de Docente
+import GeneradorEquipos from './pages/GeneradorEquipos';
+import VistaEquipos from './pages/VistaEquipos'; // Importamos la nueva vista
 
 export default function App() {
   return (
     <RoomProvider>
       <Routes>
-        {/* 1. Página de Inicio */}
+        {/* Paso 1: Landing Page principal */}
         <Route path="/" element={<LandingPage />} />
 
-        {/* 2. Primer Login */}
+        {/* Paso 2: Primer Login General */}
         <Route path="/login" element={<Login />} />
 
-        {/* 3. Selección de Rol */}
+        {/* Paso 3: Selección de Rol */}
         <Route path="/select-role" element={<RoleSelection />} />
 
-        {/* 4. Segundo Login (Generador de Equipos para Docentes) */}
+        {/* Paso 4: Segundo Login (Específico para Docente) */}
+        <Route path="/login-docente" element={<LoginDocente />} />
+
+        {/* Paso 5: Generador y Apertura de Salas */}
         <Route path="/generator" element={<GeneradorEquipos />} />
 
-        {/* 5. Dashboard Final */}
-        <Route path="/dashboard" element={<div className="p-8 font-bold">Aquí irá el Dashboard con las Cards de las salas creadas</div>} />
+        {/* Paso 6: Dashboard Final de Salas */}
+        <Route path="/dashboard" element={<div className="p-8 font-bold">Dashboard del Docente</div>} />
+
+        <Route path="/sala/:codigoSala" element={<VistaEquipos />} />
       </Routes>
     </RoomProvider>
   );

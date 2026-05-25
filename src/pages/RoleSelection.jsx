@@ -62,7 +62,7 @@ export default function RoleSelection() {
                         <Button
                             variant="primary"
                             iconRight={ArrowRight}
-                            onClick={() => navigate('/generator')}
+                            onClick={() => navigate('/login-docente')}
                             className="w-full py-4 rounded-xl text-sm font-bold bg-BlueDark-950 hover:bg-BlueDark-950/90 text-white flex justify-center items-center gap-2 shadow-sm"
                         >
                             Entrar como Docente
