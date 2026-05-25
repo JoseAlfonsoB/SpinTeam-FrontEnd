@@ -1,16 +1,14 @@
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Bell, Settings, LogOut, Users, Plus, ShieldAlert } from 'lucide-react';
 import Title from '../components/atoms/Title';
 
-export default function VistaEquipos() {
+export default function VistaEquiposAlumnos() {
     const navigate = useNavigate();
-    const { codigoSala } = useParams(); // Por si deseas capturar el código dinámico de la URL
 
     // Información de cabecera de la sala según el diseño aprobado
     const [salaInfo] = useState({
         nombre: 'Sistemas Distribuidos',
-        codigo: codigoSala || 'ABC123',
         inscritos: 20
     });
 
@@ -96,8 +94,8 @@ export default function VistaEquipos() {
 
                         <div className="flex items-center gap-3">
                             <div className="text-right hidden sm:block">
-                                <p className="text-xs font-black text-BlueDark-950 leading-tight">Hola!!! Lucio Hernandez</p>
-                                <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider block">Docente Titular</span>
+                                <p className="text-xs font-black text-BlueDark-950 leading-tight">Hola!!! José Bautista</p>
+                                <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider block">Alumno Titular</span>
                             </div>
                             <img
                                 src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
@@ -105,7 +103,7 @@ export default function VistaEquipos() {
                                 className="w-8 h-8 rounded-full object-cover border border-gray-150"
                             />
                             <button
-                                onClick={() => navigate('/generator')}
+                                onClick={() => navigate('/unidas')}
                                 className="ml-2 bg-BlueDark-950 text-white p-2 rounded-xl hover:bg-red-600 transition-colors shadow-sm"
                                 title="Volver a Salas"
                             >
@@ -125,7 +123,7 @@ export default function VistaEquipos() {
                     {/* Lado Izquierdo: Botón Atrás y Título de Vista */}
                     <div className="flex items-center gap-4">
                         <button
-                            onClick={() => navigate('/generator')}
+                            onClick={() => navigate('/unidas')}
                             className="bg-white border border-gray-200 text-gray-500 p-2.5 rounded-full hover:text-BlueDark-950 hover:bg-gray-50 shadow-sm transition-all"
                         >
                             <ArrowLeft size={16} />
@@ -145,10 +143,6 @@ export default function VistaEquipos() {
                         <div className="text-left">
                             <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider block">Sala</span>
                             <span className="text-xs font-black text-BlueDark-950">{salaInfo.nombre}</span>
-                        </div>
-                        <div className="text-left pl-6">
-                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider block">Código</span>
-                            <span className="text-xs font-black text-blue-600 tracking-wide">{salaInfo.codigo}</span>
                         </div>
                         <div className="text-left pl-6">
                             <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider block">Inscritos</span>

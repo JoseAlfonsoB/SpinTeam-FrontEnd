@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GraduationCap, Users, ArrowRight } from 'lucide-react';
 import Title from '../components/atoms/Title';
@@ -88,7 +87,7 @@ export default function RoleSelection() {
 
                         {/* Variante de botón secundario según el diseño autorizado */}
                         <button
-                            onClick={() => navigate('/generator')} // O la ruta que definas para la sala de espera FIFO del alumno
+                            onClick={() => navigate('/login-alumno')} // O la ruta que definas para la sala de espera FIFO del alumno
                             className="w-full py-4 rounded-xl text-sm font-bold bg-white border border-gray-200 text-BlueDark-950 hover:bg-gray-50 transition-colors flex justify-center items-center gap-2 shadow-sm"
                         >
                             <span>Entrar como Alumno</span>

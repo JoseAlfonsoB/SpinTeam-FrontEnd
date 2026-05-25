@@ -1,25 +1,24 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, LogOut, Users, Settings, Plus, X, Hash } from 'lucide-react';
+import { Search, LogOut, Users, Settings, Plus, X } from 'lucide-react';
 import Title from '../components/atoms/Title';
 import Button from '../components/atoms/Button';
 
-export default function GeneradorEquipos() {
+export default function EquiposUnidos() {
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     // Estados para el formulario del nuevo modal
     const [roomName, setRoomName] = useState('');
-    const [teamCount, setTeamCount] = useState('4');
-    const [selectionMethod, setSelectionMethod] = useState('FIFO');
+    const [teamCount] = useState('4');
+
 
     // Datos simulados idénticos al diseño autorizado por tu equipo
     const [rooms, setRooms] = useState([
         {
             id: 1,
             title: 'Sala de Matemáticas Avanzadas',
-            code: 'A7K92X',
             students: 20,
             perTeam: 4,
             status: 'Activa'
@@ -27,7 +26,6 @@ export default function GeneradorEquipos() {
         {
             id: 2,
             title: 'Laboratorio de Ciencias',
-            code: 'B3M85Y',
             students: 18,
             perTeam: 3,
             status: 'Activa'
@@ -35,7 +33,6 @@ export default function GeneradorEquipos() {
         {
             id: 3,
             title: 'Taller de Escritura',
-            code: 'P9Q14Z',
             students: 0,
             perTeam: 5,
             status: 'Inactiva'
@@ -90,7 +87,7 @@ export default function GeneradorEquipos() {
                     {/* Perfil del Docente / Cierre */}
                     <div className="flex items-center justify-end gap-3">
                         <div className="text-right hidden sm:block">
-                            <p className="text-xs font-black text-BlueDark-950 leading-tight">Hola!!! Lucio Hernandez</p>
+                            <p className="text-xs font-black text-BlueDark-950 leading-tight">Hola!!! José Bautista</p>
                             <button
                                 onClick={() => navigate('/select-role')}
                                 className="text-[10px] font-bold text-gray-400 hover:text-red-500 flex items-center gap-1 justify-end mt-0.5 transition-colors"
@@ -120,7 +117,7 @@ export default function GeneradorEquipos() {
                 {/* Título Central */}
                 <div className="text-center relative">
                     <Title level={1} className="text-3xl md:text-4xl font-black text-BlueDark-950 tracking-tight inline-block relative pb-2">
-                        Salas Creadas
+                        Salas Unidas
                         <span className="absolute bottom-0 left-1/4 right-1/4 h-[3px] bg-BlueDark-950 rounded-full"></span>
                     </Title>
                 </div>
@@ -147,11 +144,6 @@ export default function GeneradorEquipos() {
                                     </span>
                                 </div>
 
-                                {/* Código de la Sala */}
-                                <p className="text-xs text-gray-400 font-bold tracking-wide flex items-center gap-1 uppercase">
-                                    🔑 CÓDIGO: <span className="text-BlueDark-950 font-black">{room.code}</span>
-                                </p>
-
                                 {/* Indicadores Estadísticos */}
                                 <div className="space-y-2.5 pt-2">
                                     <div className="flex items-center gap-2.5 text-xs text-gray-500 font-medium">
@@ -168,7 +160,7 @@ export default function GeneradorEquipos() {
                             {/* Acciones de la Tarjeta */}
                             <div className="flex items-center gap-2 pt-2">
                                 <button
-                                    onClick={() => navigate(`/sala/${room.code}`)} // ✨ Redirecciona a la siguiente pantalla
+                                    onClick={() => navigate(`/salas/${room.code}`)} // ✨ Redirecciona a la siguiente pantalla
                                     disabled={room.status === 'Inactiva'}
                                     className={`flex-1 py-3 text-xs font-bold text-white rounded-xl transition-all shadow-sm flex justify-center items-center ${room.status === 'Inactiva'
                                         ? 'bg-gray-300 cursor-not-allowed'
@@ -223,18 +215,15 @@ export default function GeneradorEquipos() {
 
                         <div className="mb-6">
                             <Title level={2} className="text-xl md:text-2xl font-black text-BlueDark-950">
-                                Crear Nueva Sala
+                                Unirse a una Sala
                             </Title>
-                            <p className="text-xs text-gray-400 font-medium mt-0.5">
-                                Establece las reglas de ordenamiento para tu grupo.
-                            </p>
                         </div>
 
                         <form onSubmit={handleCreateRoomSubmit} className="space-y-5">
                             {/* Input: Nombre */}
                             <div className="space-y-1.5">
                                 <label className="text-xs font-bold text-BlueDark-950 pl-0.5">
-                                    Nombre de la Sala / Clase <span className="text-red-500">*</span>
+                                    Agregar el código de la Sala  <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
@@ -245,67 +234,18 @@ export default function GeneradorEquipos() {
                                         required
                                         value={roomName}
                                         onChange={(e) => setRoomName(e.target.value)}
-                                        placeholder="Ej. Estructuras de Datos"
+                                        placeholder="Ej. ESG - 429"
                                         className="w-full bg-[#fcfbfa] border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-xs font-semibold focus:outline-none focus:border-BlueDark-700 transition-colors"
                                     />
-                                </div>
-                            </div>
-
-                            {/* Input: Cantidad de Equipos */}
-                            <div className="space-y-1.5">
-                                <label className="text-xs font-bold text-BlueDark-950 pl-0.5">
-                                    Integrantes por Equipo <span className="text-red-500">*</span>
-                                </label>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                                        <Hash size={15} />
-                                    </div>
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        value={teamCount}
-                                        onChange={(e) => setTeamCount(e.target.value)}
-                                        className="w-full bg-[#fcfbfa] border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-xs font-semibold focus:outline-none focus:border-BlueDark-700 transition-colors"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Selector Métodos */}
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-BlueDark-950 pl-0.5">
-                                    Método de Selección
-                                </label>
-                                <div className="grid grid-cols-2 gap-2 bg-[#f5f4f0] p-1 rounded-xl border border-gray-200">
-                                    <button
-                                        type="button"
-                                        onClick={() => setSelectionMethod('FIFO')}
-                                        className={`py-2 rounded-lg text-[11px] font-bold transition-all ${selectionMethod === 'FIFO'
-                                            ? 'bg-BlueDark-950 text-white shadow-sm'
-                                            : 'text-gray-500'
-                                            }`}
-                                    >
-                                        Fila FIFO
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setSelectionMethod('Aleatorio')}
-                                        className={`py-2 rounded-lg text-[11px] font-bold transition-all ${selectionMethod === 'Aleatorio'
-                                            ? 'bg-BlueDark-950 text-white shadow-sm'
-                                            : 'text-gray-500'
-                                            }`}
-                                    >
-                                        Aleatorio
-                                    </button>
                                 </div>
                             </div>
 
                             <Button
                                 type="submit"
                                 variant="primary"
-                                iconRight={Plus}
                                 className="w-full py-3 bg-BlueDark-950 text-white text-xs font-bold rounded-xl mt-2 flex justify-center items-center gap-1 shadow-md"
                             >
-                                Registrar y Habilitar
+                                Unirse a la Sala
                             </Button>
                         </form>
                     </div>
