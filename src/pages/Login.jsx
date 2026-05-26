@@ -1,20 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Mail, ArrowRight, ArrowLeft, Eye, Users } from 'lucide-react';
 import Title from '../components/atoms/Title';
 import Button from '../components/atoms/Button';
+import { useAuth } from '../context/AuthContext';
 
 // Nota: Para la imagen de la izquierda, usaremos un placeholder de alta resolución de una oficina moderna.
 // En producción, reemplázala por tu archivo de imagen real (ej: import officeImage from '../assets/office.jpg';)
 
 export default function Login() {
     const navigate = useNavigate();
+    const { login } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
-    const handleSubmit = (e) => {
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('error') === 'google_auth_failed') {
+            setError('La autenticación con Google falló. Inténtalo de nuevo.');
+        }
+    }, []);
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
 
@@ -23,10 +32,11 @@ export default function Login() {
             return;
         }
 
-        if (email.includes('@') && password.length >= 6) {
+        try {
+            await login(email, password);
             navigate('/select-role');
-        } else {
-            setError('Credenciales inválidas. Contraseña mínimo de 6 caracteres.');
+        } catch (err) {
+            setError(err.message || 'Error al iniciar sesión. Verifica tus credenciales.');
         }
     };
 
@@ -96,6 +106,13 @@ export default function Login() {
 
                         {/* Formulario */}
                         <form onSubmit={handleSubmit} className="space-y-6">
+
+                            {/* ALERTA DE ERROR */}
+                            {error && (
+                                <div className="p-4 bg-red-50 border border-red-100 text-red-600 text-sm font-semibold rounded-xl text-center animate-shake">
+                                    {error}
+                                </div>
+                            )}
 
                             {/* Campo: Correo Electrónico */}
                             <div className="space-y-2">
@@ -167,10 +184,11 @@ export default function Login() {
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
-                                <button className="flex items-center justify-center gap-3 py-3 px-4 border border-GrayBlue-200 rounded-xl bg-white hover:bg-GrayBlue-50 transition-colors text-BlueDark-950 shadow-sm">
+                                <a href={`${import.meta.env.VITE_API_URL}/api/auth/google`} 
+                                className="flex items-center justify-center gap-3 py-3 px-4 border border-GrayBlue-200 rounded-xl bg-white hover:bg-GrayBlue-50 transition-colors text-BlueDark-950 shadow-sm">
                                     <img src="https://authjs.dev/img/providers/google.svg" alt="Google" className="w-5 h-5" />
                                     <span className="text-sm font-bold">Google</span>
-                                </button>
+                                </a>
                                 <button className="flex items-center justify-center gap-3 py-3 px-4 border border-GrayBlue-200 rounded-xl bg-white hover:bg-GrayBlue-50 transition-colors text-BlueDark-950 shadow-sm">
                                     <Users size={20} className="text-GrayBlue-500" />
                                     <span className="text-sm font-bold">SSO</span>

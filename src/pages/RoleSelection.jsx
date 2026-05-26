@@ -1,10 +1,32 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GraduationCap, Users, ArrowRight } from 'lucide-react';
 import Title from '../components/atoms/Title';
 import Button from '../components/atoms/Button';
+import { useAuth } from '../context/AuthContext';
 
 export default function RoleSelection() {
     const navigate = useNavigate();
+    const { user, loading, logout } = useAuth();
+
+    useEffect(() => {
+        if (!loading && !user) {
+            navigate('/login');
+        }
+    }, [user, loading, navigate]);
+
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-[#f3f4f6] flex items-center justify-center">
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-BlueDark-950"></div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-[#f3f4f6] font-sans text-BlueDark-950 flex flex-col justify-between">
@@ -19,9 +41,31 @@ export default function RoleSelection() {
                     <span className="text-xl font-bold tracking-tight">SpinTeam</span>
                 </div>
 
-                <div className="flex items-center gap-6 text-sm font-semibold text-gray-500">
-                    <a href="#" className="hover:text-BlueDark-950 transition-colors">Ayuda</a>
-                    <a href="#" className="hover:text-BlueDark-950 transition-colors">Contacto</a>
+                <div className="flex items-center gap-6">
+                    {user && (
+                        <div className="flex items-center gap-3 border-r border-gray-200 pr-6 mr-1">
+                            {user.fotoUrl ? (
+                                <img src={user.fotoUrl} alt={user.nombre} className="w-8 h-8 rounded-full border border-gray-200 object-cover" />
+                            ) : (
+                                <div className="w-8 h-8 rounded-full bg-BlueDark-950 text-white flex items-center justify-center font-black text-xs uppercase">
+                                    {user.nombre ? user.nombre.charAt(0) : user.email.charAt(0)}
+                                </div>
+                            )}
+                            <div className="text-left hidden sm:block">
+                                <p className="text-xs font-black text-BlueDark-950 leading-tight">
+                                    {user.nombre ? `${user.nombre} ${user.apellido || ''}` : user.email}
+                                </p>
+                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{user.email}</p>
+                            </div>
+                        </div>
+                    )}
+
+                    <button 
+                        onClick={handleLogout}
+                        className="text-xs font-bold uppercase tracking-widest text-red-500 hover:text-red-700 transition-colors"
+                    >
+                        Cerrar Sesión
+                    </button>
                 </div>
             </nav>
 

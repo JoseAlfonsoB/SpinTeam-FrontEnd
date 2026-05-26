@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
 import { RoomProvider } from './context/RoomContext';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
@@ -9,16 +10,21 @@ import GeneradorEquipos from './pages/GeneradorEquipos';
 import VistaEquipos from './pages/VistaEquipos'; 
 import VistaEquiposAlumnos from './pages/VistaEquiposAlumnos'; 
 import EquiposUnidos from './pages/EquiposUnidos';
+import AuthCallback from './pages/AuthCallback';
 
 export default function App() {
   return (
-    <RoomProvider>
-      <Routes>
+    <AuthProvider>
+      <RoomProvider>
+        <Routes>
         {/* Paso 1: Landing Page principal */}
         <Route path="/" element={<LandingPage />} />
 
         {/* Paso 2: Primer Login General */}
         <Route path="/login" element={<Login />} />
+        
+        {/* Pasar por archivo de valdiacion de google */}
+        <Route path="/auth/callback" element={<AuthCallback />} />
 
         {/* Paso 3: Selección de Rol */}
         <Route path="/select-role" element={<RoleSelection />} />
@@ -42,6 +48,7 @@ export default function App() {
 
         <Route path="/salas/:codigoSala" element={<VistaEquiposAlumnos />} />
       </Routes>
-    </RoomProvider>
+      </RoomProvider>
+    </AuthProvider>
   );
 }

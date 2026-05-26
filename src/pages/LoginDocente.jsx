@@ -3,16 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { GraduationCap, User, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import Title from '../components/atoms/Title';
 import Button from '../components/atoms/Button';
+import { useAuth } from '../context/AuthContext';
 
 export default function LoginDocente() {
     const navigate = useNavigate();
+    const { register } = useAuth();
     const [nombre, setNombre] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
 
@@ -21,11 +23,12 @@ export default function LoginDocente() {
             return;
         }
 
-        if (email.includes('@') && password.length >= 6) {
+        try {
+            await register(nombre, email, password);
             // Flujo correcto: Tras autenticarse como docente va al generador de salas
             navigate('/generator');
-        } else {
-            setError('Credenciales inválidas o contraseña demasiado corta (mínimo 6 caracteres).');
+        } catch (err) {
+            setError(err.message || 'Error al registrar el docente.');
         }
     };
 
