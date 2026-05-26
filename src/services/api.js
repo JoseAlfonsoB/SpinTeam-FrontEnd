@@ -4,6 +4,7 @@ const getHeaders = () => {
   const token = localStorage.getItem('token');
   const headers = {
     'Content-Type': 'application/json',
+    'ngrok-skip-browser-warning': 'true', // Salta la pantalla de advertencia de ngrok para llamadas API
   };
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
