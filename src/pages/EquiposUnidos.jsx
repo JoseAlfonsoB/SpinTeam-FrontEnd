@@ -3,9 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { Search, LogOut, Users, Settings, Plus, X } from 'lucide-react';
 import Title from '../components/atoms/Title';
 import Button from '../components/atoms/Button';
+import { useAuth } from '../context/AuthContext';
 
 export default function EquiposUnidos() {
     const navigate = useNavigate();
+    const { user, logout } = useAuth();
+
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
     const [searchQuery, setSearchQuery] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -84,26 +91,29 @@ export default function EquiposUnidos() {
                         />
                     </div>
 
-                    {/* Perfil del Docente / Cierre */}
+                    {/* Perfil del Alumno / Cierre */}
                     <div className="flex items-center justify-end gap-3">
                         <div className="text-right hidden sm:block">
-                            <p className="text-xs font-black text-BlueDark-950 leading-tight">Hola!!! José Bautista</p>
-                            <button
-                                onClick={() => navigate('/select-role')}
-                                className="text-[10px] font-bold text-gray-400 hover:text-red-500 flex items-center gap-1 justify-end mt-0.5 transition-colors"
-                            >
-                                <LogOut size={10} /> Cerrar Sesión
-                            </button>
+                            <p className="text-xs font-black text-BlueDark-950 leading-tight">
+                                {user ? (user.nombre ? `${user.nombre} ${user.apellido || ''}` : user.email) : 'Usuario'}
+                            </p>
+                            <p className="text-[10px] text-gray-400 font-medium">{user?.email}</p>
                         </div>
-                        <img
-                            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
-                            alt="Avatar Docente"
-                            className="w-9 height-9 rounded-full object-cover border border-gray-200 shadow-sm"
-                        />
+                        {user?.fotoUrl ? (
+                            <img
+                                src={user.fotoUrl}
+                                alt="Avatar"
+                                className="w-9 h-9 rounded-full object-cover border border-gray-200 shadow-sm"
+                            />
+                        ) : (
+                            <div className="w-9 h-9 rounded-full bg-BlueDark-950 text-white flex items-center justify-center font-black text-xs uppercase">
+                                {user?.nombre ? user.nombre.charAt(0) : '?'}
+                            </div>
+                        )}
                         <button
-                            onClick={() => navigate('/')}
+                            onClick={handleLogout}
                             className="ml-2 bg-BlueDark-950 text-white p-2 rounded-xl hover:bg-red-600 transition-colors shadow-sm"
-                            title="Volver a Salas"
+                            title="Cerrar Sesión"
                         >
                             <LogOut size={14} />
                         </button>

@@ -24,7 +24,7 @@ export default function RegisterAlumno() {
         }
 
         try {
-            await register(nombre, email, password);
+            await register(nombre, email, password, 'alumno');
             // Flujo correcto: Tras autenticarse como alumno va a las salas unidas
             navigate('/unidas');
         } catch (err) {
@@ -150,8 +150,9 @@ export default function RegisterAlumno() {
                         </div>
 
                         <div className="grid grid-cols-1 gap-4">
-                            <a href={`${import.meta.env.VITE_API_URL}/api/auth/google?action=register&role=alumno`} 
-                            className="flex items-center justify-center gap-3 py-3 px-4 border border-gray-200 rounded-xl bg-white hover:bg-gray-50 transition-colors text-BlueDark-950 shadow-sm">
+                            <a href={`${import.meta.env.VITE_API_URL}/api/auth/google?action=register&role=alumno`}
+                                onClick={() => localStorage.setItem('selected_role', 'alumno')}
+                                className="flex items-center justify-center gap-3 py-3 px-4 border border-gray-200 rounded-xl bg-white hover:bg-gray-50 transition-colors text-BlueDark-950 shadow-sm">
                                 <img src="https://authjs.dev/img/providers/google.svg" alt="Google" className="w-5 h-5" />
                                 <span className="text-sm font-bold">Google</span>
                             </a>

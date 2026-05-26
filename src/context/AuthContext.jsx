@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (nombre, email, password) => {
+  const register = async (nombre, email, password, role) => {
     try {
       // Split nombre into nombre and apellido
       const nameParts = nombre.trim().split(/\s+/);
@@ -49,7 +49,8 @@ export const AuthProvider = ({ children }) => {
         nombre: firstName,
         apellido: lastName,
         email,
-        password
+        password,
+        role
       });
 
       localStorage.setItem('token', data.token);

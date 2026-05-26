@@ -24,7 +24,7 @@ export default function RegisterDocente() {
         }
 
         try {
-            await register(nombre, email, password);
+            await register(nombre, email, password, 'docente');
             // Flujo correcto: Tras autenticarse como docente va al generador de salas
             navigate('/generator');
         } catch (err) {
@@ -151,6 +151,7 @@ export default function RegisterDocente() {
 
                         <div className="grid grid-cols-1 gap-4">
                             <a href={`${import.meta.env.VITE_API_URL}/api/auth/google?action=register&role=docente`}
+                                onClick={() => localStorage.setItem('selected_role', 'docente')}
                                 className="flex items-center justify-center gap-3 py-3 px-4 border border-gray-200 rounded-xl bg-white hover:bg-gray-50 transition-colors text-BlueDark-950 shadow-sm">
                                 <img src="https://authjs.dev/img/providers/google.svg" alt="Google" className="w-5 h-5" />
                                 <span className="text-sm font-bold">Google</span>

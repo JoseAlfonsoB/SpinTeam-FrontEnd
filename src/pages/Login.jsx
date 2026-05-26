@@ -35,8 +35,14 @@ export default function Login() {
         }
 
         try {
-            await login(email, password);
-            navigate('/dashboard'); // Ajusta esta ruta a tu dashboard principal
+            const loggedUser = await login(email, password);
+            if (loggedUser.role === 'docente') {
+                navigate('/generator');
+            } else if (loggedUser.role === 'alumno') {
+                navigate('/unidas');
+            } else {
+                navigate('/register-role');
+            }
         } catch (err) {
             setError(err.message || 'Error al iniciar sesión. Verifica tus credenciales.');
         }
