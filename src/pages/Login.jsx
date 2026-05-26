@@ -20,6 +20,8 @@ export default function Login() {
         const params = new URLSearchParams(window.location.search);
         if (params.get('error') === 'google_auth_failed') {
             setError('La autenticación con Google falló. Inténtalo de nuevo.');
+        } else if (params.get('error') === 'account_not_found') {
+            setError('Esta cuenta no existe. Por favor, regístrate.');
         }
     }, []);
 
@@ -34,7 +36,7 @@ export default function Login() {
 
         try {
             await login(email, password);
-            navigate('/select-role');
+            navigate('/dashboard'); // Ajusta esta ruta a tu dashboard principal
         } catch (err) {
             setError(err.message || 'Error al iniciar sesión. Verifica tus credenciales.');
         }
@@ -85,7 +87,7 @@ export default function Login() {
                     </button>
                     <div className="flex items-center gap-2">
                         <span className="text-sm font-semibold text-GrayBlue-500">¿No tienes cuenta?</span>
-                        <a href="#" className="text-sm font-bold text-BlueDark-700 hover:underline">Regístrate</a>
+                        <button onClick={() => navigate('/register-role')} className="text-sm font-bold text-BlueDark-700 hover:underline">Regístrate</button>
                     </div>
                 </header>
 
@@ -184,7 +186,7 @@ export default function Login() {
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
-                                <a href={`${import.meta.env.VITE_API_URL}/api/auth/google`} 
+                                <a href={`${import.meta.env.VITE_API_URL}/api/auth/google?action=login`} 
                                 className="flex items-center justify-center gap-3 py-3 px-4 border border-GrayBlue-200 rounded-xl bg-white hover:bg-GrayBlue-50 transition-colors text-BlueDark-950 shadow-sm">
                                     <img src="https://authjs.dev/img/providers/google.svg" alt="Google" className="w-5 h-5" />
                                     <span className="text-sm font-bold">Google</span>

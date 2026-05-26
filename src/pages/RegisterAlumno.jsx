@@ -5,7 +5,7 @@ import Title from '../components/atoms/Title';
 import Button from '../components/atoms/Button';
 import { useAuth } from '../context/AuthContext';
 
-export default function LoginDocente() {
+export default function RegisterAlumno() {
     const navigate = useNavigate();
     const { register } = useAuth();
     const [nombre, setNombre] = useState('');
@@ -19,16 +19,16 @@ export default function LoginDocente() {
         setError('');
 
         if (!nombre || !email || !password) {
-            setError('Por favor, rellena todos los campos para el registro del docente.');
+            setError('Por favor, rellena todos los campos para el registro del alumno.');
             return;
         }
 
         try {
             await register(nombre, email, password);
-            // Flujo correcto: Tras autenticarse como docente va al generador de salas
-            navigate('/generator');
+            // Flujo correcto: Tras autenticarse como alumno va a las salas unidas
+            navigate('/unidas');
         } catch (err) {
-            setError(err.message || 'Error al registrar el docente.');
+            setError(err.message || 'Error al registrar el alumno.');
         }
     };
 
@@ -51,7 +51,7 @@ export default function LoginDocente() {
             <main className="flex-1 flex items-center justify-center w-full z-10 py-10">
                 <div className="bg-white rounded-[2.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.04)] border border-gray-100 p-8 md:p-12 w-full max-w-[480px] flex flex-col items-center animate-fade-in">
 
-                    {/* ICONO IDENTIFICADOR DE DOCENTE */}
+                    {/* ICONO IDENTIFICADOR DE ALUMNO */}
                     <div className="bg-BlueDark-950 text-white p-4 rounded-2xl shadow-md mb-5">
                         <GraduationCap size={28} strokeWidth={1.5} />
                     </div>
@@ -59,7 +59,7 @@ export default function LoginDocente() {
                     {/* ENCABEZADOS DE TEXTO */}
                     <div className="text-center space-y-1 mb-8">
                         <Title level={2} className="text-xl md:text-2xl font-bold text-BlueDark-950 tracking-tight">
-                            Registro del usuario/docente
+                            Registro del usuario/alumno
                         </Title>
                         <p className="text-xs md:text-sm text-gray-400 font-medium">
                             Únete a nuestra plataforma de gestión académica
@@ -138,12 +138,32 @@ export default function LoginDocente() {
                         </Button>
                     </form>
 
+                    {/* Sección de Continuar con SSO */}
+                    <div className="w-full space-y-6 mt-6">
+                        <div className="relative flex items-center justify-center">
+                            <div className="absolute inset-0 flex items-center">
+                                <div className="w-full border-t border-gray-200"></div>
+                            </div>
+                            <span className="relative z-10 bg-white px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                                O registrarse con
+                            </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4">
+                            <a href={`${import.meta.env.VITE_API_URL}/api/auth/google?action=register&role=alumno`} 
+                            className="flex items-center justify-center gap-3 py-3 px-4 border border-gray-200 rounded-xl bg-white hover:bg-gray-50 transition-colors text-BlueDark-950 shadow-sm">
+                                <img src="https://authjs.dev/img/providers/google.svg" alt="Google" className="w-5 h-5" />
+                                <span className="text-sm font-bold">Google</span>
+                            </a>
+                        </div>
+                    </div>
+
                     {/* REDIRECCIÓN DE PIE DE FORMULARIO */}
                     <div className="text-center mt-6 text-xs text-gray-400 font-semibold">
                         ¿Ya tienes una cuenta?{' '}
-                        <a href="#" className="text-BlueDark-950 hover:underline font-bold">
+                        <button type="button" onClick={() => navigate('/login')} className="text-BlueDark-950 hover:underline font-bold">
                             Inicia Sesión
-                        </a>
+                        </button>
                     </div>
 
                     {/* ENLACES LEGALES INTERNOS DE LA TARJETA */}

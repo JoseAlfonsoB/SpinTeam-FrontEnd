@@ -5,15 +5,12 @@ import Title from '../components/atoms/Title';
 import Button from '../components/atoms/Button';
 import { useAuth } from '../context/AuthContext';
 
-export default function RoleSelection() {
+export default function RegisterRole() {
     const navigate = useNavigate();
     const { user, loading, logout } = useAuth();
 
-    useEffect(() => {
-        if (!loading && !user) {
-            navigate('/login');
-        }
-    }, [user, loading, navigate]);
+    // Quitamos la redirección automática al login si no hay usuario,
+    // porque esta es una página de registro público.
 
     const handleLogout = () => {
         logout();
@@ -75,10 +72,10 @@ export default function RoleSelection() {
                 {/* Título e Instrucción Principal */}
                 <div className="text-center space-y-3 mb-12 max-w-2xl">
                     <Title level={1} className="text-4xl md:text-5xl font-black text-BlueDark-950 tracking-tight leading-tight">
-                        ¿Cómo deseas ingresar <br className="hidden sm:inline" /> hoy?
+                        ¿Cómo deseas registrarte <br className="hidden sm:inline" /> hoy?
                     </Title>
                     <p className="text-sm md:text-base text-gray-500 font-medium">
-                        Personaliza tu experiencia de gestión según tu perfil de usuario.
+                        Selecciona tu perfil para crear tu cuenta.
                     </p>
                 </div>
 
@@ -105,10 +102,10 @@ export default function RoleSelection() {
                         <Button
                             variant="primary"
                             iconRight={ArrowRight}
-                            onClick={() => navigate('/login-docente')}
+                            onClick={() => navigate('/register-docente')}
                             className="w-full py-4 rounded-xl text-sm font-bold bg-BlueDark-950 hover:bg-BlueDark-950/90 text-white flex justify-center items-center gap-2 shadow-sm"
                         >
-                            Entrar como Docente
+                            Registrarse como Docente
                         </Button>
                     </div>
 
@@ -131,10 +128,10 @@ export default function RoleSelection() {
 
                         {/* Variante de botón secundario según el diseño autorizado */}
                         <button
-                            onClick={() => navigate('/login-alumno')} // O la ruta que definas para la sala de espera FIFO del alumno
+                            onClick={() => navigate('/register-alumno')}
                             className="w-full py-4 rounded-xl text-sm font-bold bg-white border border-gray-200 text-BlueDark-950 hover:bg-gray-50 transition-colors flex justify-center items-center gap-2 shadow-sm"
                         >
-                            <span>Entrar como Alumno</span>
+                            <span>Registrarse como Alumno</span>
                             <ArrowRight size={16} />
                         </button>
                     </div>
@@ -144,10 +141,10 @@ export default function RoleSelection() {
 
             {/* FOOTER SIMPLE */}
             <footer className="py-6 text-center text-xs text-gray-400 font-medium">
-                ¿No tienes una cuenta?{' '}
-                <a href="#" className="font-bold text-BlueDark-950 hover:underline">
-                    Regístrate aquí
-                </a>
+                ¿Ya tienes una cuenta?{' '}
+                <button onClick={() => navigate('/login')} className="font-bold text-BlueDark-950 hover:underline">
+                    Inicia Sesión aquí
+                </button>
             </footer>
         </div>
     );

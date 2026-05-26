@@ -3,9 +3,9 @@ import { AuthProvider } from './context/AuthContext';
 import { RoomProvider } from './context/RoomContext';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
-import RoleSelection from './pages/RoleSelection';
-import LoginDocente from './pages/LoginDocente';
-import LoginAlumno from './pages/LoginAlumno';
+import RegisterRole from './pages/RegisterRole';
+import RegisterDocente from './pages/RegisterDocente';
+import RegisterAlumno from './pages/RegisterAlumno';
 import GeneradorEquipos from './pages/GeneradorEquipos';
 import VistaEquipos from './pages/VistaEquipos'; 
 import VistaEquiposAlumnos from './pages/VistaEquiposAlumnos'; 
@@ -26,14 +26,14 @@ export default function App() {
         {/* Pasar por archivo de valdiacion de google */}
         <Route path="/auth/callback" element={<AuthCallback />} />
 
-        {/* Paso 3: Selección de Rol */}
-        <Route path="/select-role" element={<RoleSelection />} />
+        {/* Paso 3: Selección de Rol para Registro */}
+        <Route path="/register-role" element={<RegisterRole />} />
 
-        {/* Paso 4: Segundo Login (Específico para Docente) */}
-        <Route path="/login-docente" element={<LoginDocente />} />
+        {/* Paso 4: Registro Específico para Docente */}
+        <Route path="/register-docente" element={<RegisterDocente />} />
 
-        {/* Paso 4.1: Segundo Login (Específico para Alumno) */}
-        <Route path="/login-alumno" element={<LoginAlumno />} />
+        {/* Paso 4.1: Registro Específico para Alumno */}
+        <Route path="/register-alumno" element={<RegisterAlumno />} />
 
         {/* Paso 5: Generador y Apertura de Salas */}
         <Route path="/generator" element={<GeneradorEquipos />} />

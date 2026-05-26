@@ -14,7 +14,7 @@ const AuthCallback = () => {
     if (token) {
       loginWithGoogleToken(token)
         .then(() => {
-          navigate('/select-role');
+          navigate('/generator');
         })
         .catch((error) => {
           console.error('Google auth failed:', error);
