@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, LogOut, Users, Settings, Plus, X, Hash } from 'lucide-react';
 import Title from '../components/atoms/Title';
 import Button from '../components/atoms/Button';
 import { useAuth } from '../context/AuthContext';
+import { createSessionService, getMySessionsService } from '../services/api'; 
 
 export default function GeneradorEquipos() {
     const navigate = useNavigate();
@@ -15,57 +16,57 @@ export default function GeneradorEquipos() {
     };
     const [searchQuery, setSearchQuery] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isLoadingRooms, setIsLoadingRooms] = useState(true); // ✨ Estado de carga
 
     // Estados para el formulario del nuevo modal
     const [roomName, setRoomName] = useState('');
     const [teamCount, setTeamCount] = useState('4');
     const [selectionMethod, setSelectionMethod] = useState('FIFO');
 
-    // Datos simulados idénticos al diseño autorizado por tu equipo
-    const [rooms, setRooms] = useState([
-        {
-            id: 1,
-            title: 'Sala de Matemáticas Avanzadas',
-            code: 'A7K92X',
-            students: 20,
-            perTeam: 4,
-            status: 'Activa'
-        },
-        {
-            id: 2,
-            title: 'Laboratorio de Ciencias',
-            code: 'B3M85Y',
-            students: 18,
-            perTeam: 3,
-            status: 'Activa'
-        },
-        {
-            id: 3,
-            title: 'Taller de Escritura',
-            code: 'P9Q14Z',
-            students: 0,
-            perTeam: 5,
-            status: 'Inactiva'
-        }
-    ]);
+    const [rooms, setRooms] = useState([]);
 
-    // Manejador para crear sala desde el modal
-    const handleCreateRoomSubmit = (e) => {
+    useEffect(() => {
+        const fetchRooms = async () => {
+            try {
+                setIsLoadingRooms(true);
+                const data = await getMySessionsService();
+                setRooms(data); // Asignamos las salas de MongoDB al estado
+            } catch (error) {
+                console.error('Error al cargar las salas:', error);
+            } finally {
+                setIsLoadingRooms(false);
+            }
+        };
+
+        // Solo hace la petición si el usuario está autenticado
+        if (user) {
+            fetchRooms();
+        }
+    }, [user]);
+
+    // ✨ MANEJADOR CONECTADO AL BACKEND REAL
+    const handleCreateRoomSubmit = async (e) => {
         e.preventDefault();
         if (!roomName) return;
 
-        const newRoom = {
-            id: Date.now(),
-            title: roomName,
-            code: Math.random().toString(36).substring(2, 8).toUpperCase(),
-            students: 0,
-            perTeam: parseInt(teamCount) || 2,
-            status: 'Activa'
-        };
+        try {
+            // Llamamos a la API en el puerto 4000
+            const response = await createSessionService({
+                title: roomName,
+                perTeam: parseInt(teamCount) || 2,
+                selectionMethod: selectionMethod
+            });
 
-        setRooms([newRoom, ...rooms]);
-        setRoomName('');
-        setIsModalOpen(false); // Cierra el modal
+            // Agregamos la nueva sala (retornada por el backend) al inicio de la lista local
+            setRooms([response.session, ...rooms]);
+            
+            // Limpiamos y cerramos
+            setRoomName('');
+            setIsModalOpen(false); 
+        } catch (error) {
+            console.error('Error al crear la sala:', error);
+            alert(error.message); // Opcional: reemplazar por un Toast estilizado
+        }
     };
 
     return (
@@ -75,12 +76,10 @@ export default function GeneradorEquipos() {
             <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 px-6 py-4 flex items-center sticky top-0 z-40">
                 <div className="max-w-7xl w-full mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 
-                    {/* Logotipo */}
                     <div className="flex items-center gap-2">
                         <span className="text-xl font-black text-BlueDark-950 tracking-tight">SpinTeam</span>
                     </div>
 
-                    {/* Buscador Central */}
                     <div className="flex-1 max-w-md mx-0 sm:mx-8 relative">
                         <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
                             <Search size={16} />
@@ -94,7 +93,6 @@ export default function GeneradorEquipos() {
                         />
                     </div>
 
-                    {/* Perfil del Docente / Cierre */}
                     <div className="flex items-center justify-end gap-3">
                         <div className="text-right hidden sm:block">
                             <p className="text-xs font-black text-BlueDark-950 leading-tight">
@@ -127,7 +125,6 @@ export default function GeneradorEquipos() {
             {/* CONTENIDO PRINCIPAL DEL DASHBOARD */}
             <main className="flex-1 max-w-6xl w-full mx-auto px-6 py-12 flex flex-col space-y-10">
 
-                {/* Título Central */}
                 <div className="text-center relative">
                     <Title level={1} className="text-3xl md:text-4xl font-black text-BlueDark-950 tracking-tight inline-block relative pb-2">
                         Salas Creadas
@@ -136,82 +133,83 @@ export default function GeneradorEquipos() {
                 </div>
 
                 {/* GRID DE LAS CLASES O SALAS */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
+                {isLoadingRooms ? (
+                    <div className="text-center py-10 text-gray-500 font-bold">Cargando salas...</div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
+                        {rooms.map((room) => (
+                            <div
+                                key={room._id} // Mongo usa _id
+                                className="bg-white rounded-[2rem] border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.02)] p-6 md:p-8 flex flex-col justify-between space-y-6 transition-all hover:shadow-[0_12px_40px_rgba(0,0,0,0.04)]"
+                            >
+                                <div className="space-y-4">
+                                    <div className="flex justify-between items-start gap-3">
+                                        <h3 className="text-lg md:text-xl font-bold text-BlueDark-950 leading-snug tracking-tight">
+                                            {room.title}
+                                        </h3>
+                                        <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${room.status === 'Activa'
+                                            ? 'bg-green-50 text-green-600'
+                                            : 'bg-blue-50 text-blue-500'
+                                            }`}>
+                                            {room.status}
+                                        </span>
+                                    </div>
 
-                    {rooms.map((room) => (
+                                    <p className="text-xs text-gray-400 font-bold tracking-wide flex items-center gap-1 uppercase">
+                                        🔑 CÓDIGO: <span className="text-BlueDark-950 font-black">{room.code}</span>
+                                    </p>
+
+                                    
+
+                                    <div className="space-y-2.5 pt-2">
+                                        <div className="flex items-center gap-2.5 text-xs text-gray-500 font-medium">
+                                            <Users size={15} className="text-gray-400" />
+                                            {/* Mapeamos el tamaño del array de estudiantes guardados en DB */}
+                                            <span><strong className="text-BlueDark-950 font-bold">{room.students?.length || 0}</strong> alumnos conectados</span>
+                                        </div>
+                                        <div className="flex items-center gap-2.5 text-xs text-gray-500 font-medium">
+                                            <Users size={15} className="text-gray-400" />
+                                            <span><strong className="text-BlueDark-950 font-bold">{room.perTeam}</strong> integrantes por equipo</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-2 pt-2">
+                                    <button
+                                        onClick={() => navigate(`/sala/${room.code}`)}
+                                        disabled={room.status === 'Inactiva'}
+                                        className={`flex-1 py-3 text-xs font-bold text-white rounded-xl transition-all shadow-sm flex justify-center items-center ${room.status === 'Inactiva'
+                                            ? 'bg-gray-300 cursor-not-allowed'
+                                            : 'bg-BlueDark-950 hover:bg-BlueDark-950/90'
+                                            }`}
+                                    >
+                                        Ingresar
+                                    </button>
+                                    <button className="p-3 text-gray-400 border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-BlueDark-950 transition-colors">
+                                        <Settings size={14} />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+
+                        {/* TARJETA DISCRETA / ACCESO RÁPIDO ALTERNATIVO PARA CREAR */}
                         <div
-                            key={room.id}
-                            className="bg-white rounded-[2rem] border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.02)] p-6 md:p-8 flex flex-col justify-between space-y-6 transition-all hover:shadow-[0_12px_40px_rgba(0,0,0,0.04)]"
+                            onClick={() => setIsModalOpen(true)}
+                            className="bg-transparent rounded-[2rem] border-2 border-dashed border-gray-300/80 p-8 flex flex-col items-center justify-center text-center space-y-3 cursor-pointer group hover:border-BlueDark-700 transition-all min-h-[250px]"
                         >
-                            <div className="space-y-4">
-                                {/* Encabezado de la Card: Título y Badge */}
-                                <div className="flex justify-between items-start gap-3">
-                                    <h3 className="text-lg md:text-xl font-bold text-BlueDark-950 leading-snug tracking-tight">
-                                        {room.title}
-                                    </h3>
-                                    <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${room.status === 'Activa'
-                                        ? 'bg-green-50 text-green-600'
-                                        : 'bg-blue-50 text-blue-500'
-                                        }`}>
-                                        {room.status}
-                                    </span>
-                                </div>
-
-                                {/* Código de la Sala */}
-                                <p className="text-xs text-gray-400 font-bold tracking-wide flex items-center gap-1 uppercase">
-                                    🔑 CÓDIGO: <span className="text-BlueDark-950 font-black">{room.code}</span>
-                                </p>
-
-                                {/* Indicadores Estadísticos */}
-                                <div className="space-y-2.5 pt-2">
-                                    <div className="flex items-center gap-2.5 text-xs text-gray-500 font-medium">
-                                        <Users size={15} className="text-gray-400" />
-                                        <span><strong className="text-BlueDark-950 font-bold">{room.students}</strong> alumnos conectados</span>
-                                    </div>
-                                    <div className="flex items-center gap-2.5 text-xs text-gray-500 font-medium">
-                                        <Users size={15} className="text-gray-400" />
-                                        <span><strong className="text-BlueDark-950 font-bold">{room.perTeam}</strong> integrantes por equipo</span>
-                                    </div>
-                                </div>
+                            <div className="bg-white border border-gray-200 text-gray-400 p-3 rounded-full shadow-sm group-hover:scale-105 transition-transform group-hover:text-BlueDark-950 group-hover:border-transparent">
+                                <Plus size={20} />
                             </div>
-
-                            {/* Acciones de la Tarjeta */}
-                            <div className="flex items-center gap-2 pt-2">
-                                <button
-                                    onClick={() => navigate(`/sala/${room.code}`)} // ✨ Redirecciona a la siguiente pantalla
-                                    disabled={room.status === 'Inactiva'}
-                                    className={`flex-1 py-3 text-xs font-bold text-white rounded-xl transition-all shadow-sm flex justify-center items-center ${room.status === 'Inactiva'
-                                        ? 'bg-gray-300 cursor-not-allowed'
-                                        : 'bg-BlueDark-950 hover:bg-BlueDark-950/90'
-                                        }`}
-                                >
-                                    Ingresar
-                                </button>
-                                <button className="p-3 text-gray-400 border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-BlueDark-950 transition-colors">
-                                    <Settings size={14} />
-                                </button>
+                            <div>
+                                <p className="text-sm font-bold text-gray-400 group-hover:text-BlueDark-950 transition-colors">Crear Nueva Sala</p>
+                                <p className="text-[11px] text-gray-400 max-w-[180px] mx-auto mt-0.5">Configura un nuevo espacio de aprendizaje para tus estudiantes.</p>
                             </div>
                         </div>
-                    ))}
 
-                    {/* TARJETA DISCRETA / ACCESO RÁPIDO ALTERNATIVO PARA CREAR */}
-                    <div
-                        onClick={() => setIsModalOpen(true)}
-                        className="bg-transparent rounded-[2rem] border-2 border-dashed border-gray-300/80 p-8 flex flex-col items-center justify-center text-center space-y-3 cursor-pointer group hover:border-BlueDark-700 transition-all min-h-[250px]"
-                    >
-                        <div className="bg-white border border-gray-200 text-gray-400 p-3 rounded-full shadow-sm group-hover:scale-105 transition-transform group-hover:text-BlueDark-950 group-hover:border-transparent">
-                            <Plus size={20} />
-                        </div>
-                        <div>
-                            <p className="text-sm font-bold text-gray-400 group-hover:text-BlueDark-950 transition-colors">Crear Nueva Sala</p>
-                            <p className="text-[11px] text-gray-400 max-w-[180px] mx-auto mt-0.5">Configura un nuevo espacio de aprendizaje para tus estudiantes.</p>
-                        </div>
                     </div>
-
-                </div>
+                )}
             </main>
 
-            {/* BOTÓN FLOTANTE PRINCIPAL (FAB) - ENCARGADO DE ABRIR EL MODAL */}
             <button
                 onClick={() => setIsModalOpen(true)}
                 className="fixed bottom-6 right-6 bg-BlueDark-950 text-white p-4 rounded-full shadow-xl hover:bg-BlueDark-950/90 hover:scale-105 transition-all z-50 flex items-center justify-center border border-white/10"
@@ -241,7 +239,6 @@ export default function GeneradorEquipos() {
                         </div>
 
                         <form onSubmit={handleCreateRoomSubmit} className="space-y-5">
-                            {/* Input: Nombre */}
                             <div className="space-y-1.5">
                                 <label className="text-xs font-bold text-BlueDark-950 pl-0.5">
                                     Nombre de la Sala / Clase <span className="text-red-500">*</span>
@@ -261,7 +258,6 @@ export default function GeneradorEquipos() {
                                 </div>
                             </div>
 
-                            {/* Input: Cantidad de Equipos */}
                             <div className="space-y-1.5">
                                 <label className="text-xs font-bold text-BlueDark-950 pl-0.5">
                                     Integrantes por Equipo <span className="text-red-500">*</span>
@@ -280,7 +276,6 @@ export default function GeneradorEquipos() {
                                 </div>
                             </div>
 
-                            {/* Selector Métodos */}
                             <div className="space-y-2">
                                 <label className="text-xs font-bold text-BlueDark-950 pl-0.5">
                                     Método de Selección
@@ -322,7 +317,6 @@ export default function GeneradorEquipos() {
                 </div>
             )}
 
-            {/* FOOTER */}
             <footer className="py-6 text-center text-[10px] text-gray-400 font-medium border-t border-gray-100 bg-white/40">
                 © {new Date().getFullYear()} EduSync Premium Management. Todos los derechos reservados.
             </footer>

@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState } from 'react';
-// IMPORTAMOS EL SERVICIO DE ALGORITMOS QUE ACABAMOS DE CREAR
-import { generateTeamsAlgorithm } from '../services/sortingAlgorithms';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { generateTeamsService } from '../services/api';
+import { socket } from '../services/socket';
 
 const RoomContext = createContext();
 
@@ -9,7 +9,31 @@ export function RoomProvider({ children }) {
     const [students, setStudents] = useState([]);
     const [teams, setTeams] = useState([]);
 
-    // Función para que el Docente cree la sala
+    // EFECTO GLOBAL DE SOCKET.IO
+    useEffect(() => {
+        socket.on('update_students', (updatedStudentsList) => {
+            console.log('Actualización de alumnos:', updatedStudentsList);
+            setStudents(updatedStudentsList);
+        });
+
+        socket.on('teams_ready', (generatedTeams) => {
+            console.log('Equipos listos:', generatedTeams);
+            setTeams(generatedTeams);
+        });
+
+        return () => {
+            socket.off('update_students');
+            socket.off('teams_ready');
+        };
+    }, []);
+
+    const connectToRoomSocket = (code, user, role) => {
+        if (!socket.connected) {
+            socket.connect();
+        }
+        socket.emit('join_room', { code, user, role });
+    };
+
     const createRoom = (config) => {
         const randomCode = `${config.algorithm}-${Math.floor(100 + Math.random() * 900)}`;
         setRoomConfig({ ...config, code: randomCode });
@@ -17,39 +41,30 @@ export function RoomProvider({ children }) {
         setTeams([]);
     };
 
-    // Función para que el Alumno se una a la fila
-    const joinRoom = (studentName, roomCode) => {
-        if (!roomConfig || roomConfig.code !== roomCode) {
-            throw new Error('El código de la sala no existe o es incorrecto.');
-        }
-
-        const newStudent = {
-            id: Date.now().toString(),
-            name: studentName,
-            status: 'waiting'
-        };
-
-        setStudents((prev) => [...prev, newStudent]);
-        return true;
+    // Función del alumno para entrar
+    const joinRoom = (user, roomCode) => {
+        connectToRoomSocket(roomCode, user, 'alumno');
     };
 
-    // FUNCIÓN ACTUALIZADA: Ahora delega la responsabilidad al servicio externo
-    const generateTeams = () => {
-        if (students.length === 0 || !roomConfig) return;
+    // Función del docente para generar (llama a API REST y luego emite Socket)
+    const generateTeams = async (roomCode) => {
+        if (students.length === 0) return;
 
-        // 1. Llamamos al algoritmo de la carpeta services pasando los datos limpios
-        const resultTeams = generateTeamsAlgorithm(
-            students,
-            roomConfig.teamCount,
-            roomConfig.algorithm
-        );
-
-        // 2. Actualizamos los estados con el resultado del algoritmo
-        setStudents((prev) => prev.map(s => ({ ...s, status: 'assigned' })));
-        setTeams(resultTeams);
+        try {
+            const response = await generateTeamsService(roomCode);
+            setTeams(response.teams);
+            
+            // Avisa a los demás que ya están listos
+            socket.emit('teams_generated', { code: roomCode, teams: response.teams });
+            
+        } catch (error) {
+            console.error('Error al generar equipos:', error);
+            alert(error.message || 'Hubo un problema al generar los equipos.');
+        }
     };
 
     const resetRoom = () => {
+        socket.disconnect();
         setRoomConfig(null);
         setStudents([]);
         setTeams([]);
@@ -63,6 +78,7 @@ export function RoomProvider({ children }) {
             createRoom,
             joinRoom,
             generateTeams,
+            connectToRoomSocket,
             resetRoom
         }}>
             {children}
